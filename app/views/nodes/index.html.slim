@@ -12,55 +12,52 @@ h1 Nodes
     a.btn.btn-default[href="/nodes"] Refresh
 = form_tag(nodes_path, method: "put")
 .nodes-container
-  form
-    table.table
-      thead
+  table.table
+    thead
+      tr
+        th
+          | Id
+        th
+          | Status
+        th
+          | Hostname
+        th
+          | Role
+        th
+          | Highstate
+        th
+          | Master
+    tbody
+      - Minion.all.each do |m|
         tr
           th
-            | Id
-          th
-            | Status
-          th
-            | Hostname
-          th
-            | Role
-          th
-            | Highstate
-          th
-            | Master
-      tbody
-        - Minion.all.each do |m|
-          tr
-            th
-              | #{m.id}
-            td
-              - if m.role
-                i.fa.fa-check-circle-o.text-success.fa-2x aria-hidden="true"
-              - else
-                span.fa-stack aria-hidden="true"
-                  i.fa.fa-circle.fa-stack-2x.text-success aria-hidden="true"
-                  i.fa.fa-refresh.fa-stack-1x.fa-spin.fa-inverse aria-hidden="true"
-            td
-              | #{m.hostname}
-            td
-              | #{m.role}
-            td
-              | #{m.highstate}
-            td
-              - if m.role == "master"
-                = radio_button_tag "roles[#{m.hostname}]", ["master"], true, disabled: true
-              - elsif Minion.all.collect(&:role).include?("master")
-                = radio_button_tag "roles[#{m.hostname}]", ["master"], false, disabled: true
-              - else
-                = radio_button_tag "roles[#{m.hostname}]", ["master"]
+            | #{m.id}
+          td
+            - if m.role
+              i.fa.fa-check-circle-o.text-success.fa-2x aria-hidden="true"
+            - else
+              span.fa-stack aria-hidden="true"
+                i.fa.fa-circle.fa-stack-2x.text-success aria-hidden="true"
+                i.fa.fa-refresh.fa-stack-1x.fa-spin.fa-inverse aria-hidden="true"
+          td
+            | #{m.hostname}
+          td
+            | #{m.role}
+          td
+            | #{m.highstate}
+          td
+            - if m.role == "master"
+              = radio_button_tag "roles[#{m.hostname}]", ["master"], true, disabled: true
+            - elsif Minion.all.collect(&:role).include?("master")
+              = radio_button_tag "roles[#{m.hostname}]", ["master"], false, disabled: true
+            - else
+              = radio_button_tag "roles[#{m.hostname}]", ["master"]
   .clearfix.text-right.steps-container
     a.btn.btn-danger[href="/"] Back
     - if Minion.all.collect(&:role).include?("master")
       = submit_tag "Apply", class: "btn btn-primary", disabled: true
     - else
       = submit_tag "Apply", class: "btn btn-primary"
-h1
-  | Bootstrap cluster
 
 = link_to "Bootstrap cluster", bootstrap_nodes_path, method: :post, class: "btn btn-success btn-lg", id: "bootstrap-cluster"
 
