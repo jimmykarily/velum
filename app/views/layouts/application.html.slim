@@ -14,8 +14,7 @@ html(lang='en')
 
   body class="#{yield :body_class}"
     .container
-      header.row
-        = render :partial => "shared/header"
+      = render :partial => "shared/header"
       .row
         .col-xs-12
           = render :partial => "shared/notifications"
