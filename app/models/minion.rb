@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "velum/salt_minion"
+require "velum/salt"
 
 # Minion represents the minions that have been registered in this application.
 class Minion < ApplicationRecord
@@ -45,6 +46,28 @@ class Minion < ApplicationRecord
         end
       end
     end
+  end
+
+  # This method is used to collect the specs of each Minion (RAM/CPU/etc).
+  # The user might need this information in order to decide which Minion
+  # is going to be the kubernetes master or minion.
+  def self.collect_specs(hostnames: [], spec:)
+    return {} unless hostnames.any?
+
+    spec_map = {
+      "cpu" => "cat /proc/cpuinfo | grep -E 'model name|cpu cores|cpu MHz'",
+      "ram" => "cat /proc/meminfo | grep -E 'MemTotal'"
+    }
+
+    result = Velum::Salt.call(action: "cmd.run",
+                              targets: hostnames.join(','),
+                              arg: spec_map[spec])[1]
+
+    result["return"].first
+  end
+
+  def collect_specs(spec)
+    self.class.collect_specs(hostnames: [self.hostname], spec: spec).values.first
   end
 
   # rubocop:disable SkipsModelValidations
