@@ -4,7 +4,6 @@ require "rails_helper"
 describe "nodes/index" do
   context "regular render" do
     it "has the url on the data-url attribute" do
-      pending("We need to get polling back")
       render
 
       section = assert_select(".nodes-container")
@@ -21,11 +20,10 @@ describe "nodes/index" do
     end
 
     it "polls for minions" do
-      pending("We need to get polling back")
       render
 
       script = assert_select("script").children.text
-      expect(script.strip).to eq "MinionPoller.poll();"
+      expect(script.strip).to match /MinionPoller\.poll/
     end
   end
 end

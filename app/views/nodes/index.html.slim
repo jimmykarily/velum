@@ -10,8 +10,9 @@ h1 Nodes
   .col-xs-12.discovery-control
     span #{Minion.count} Nodes found
 = form_tag(nodes_path, method: "put")
-.nodes-container
-  table.table
+.nodes-container data-url=nodes_path
+  - master_already_exists = Minion.exists?(role: "master")
+  table.table data-master-exists=master_already_exists.to_s
     thead
       tr
         th
@@ -22,12 +23,11 @@ h1 Nodes
           | Hostname
         th
           | Role
-        th
-          | Highstate
         th.text-center
           | Master
     tbody
       - Minion.all.each do |m|
+        - #TODO  Make this match javascript classes
         tr
           th
             | #{m.id}
@@ -42,12 +42,10 @@ h1 Nodes
             | #{m.hostname}
           td
             | #{m.role}
-          td
-            | #{m.highstate}
           td.text-center
             - if m.role == "master"
               = radio_button_tag "roles[master]", m.id, true, disabled: true
-            - elsif Minion.exists?(role: "master")
+            - elsif master_already_exists
               = radio_button_tag "roles[master]", m.id, false, disabled: true
             - else
               = radio_button_tag "roles[master]", m.id
@@ -57,3 +55,5 @@ h1 Nodes
       = submit_tag "Bootstrap Cluster", class: "btn btn-primary", disabled: true
     - else
       = submit_tag "Bootstrap Cluster", class: "btn btn-primary"
+
+  = render "dashboard/polling"
